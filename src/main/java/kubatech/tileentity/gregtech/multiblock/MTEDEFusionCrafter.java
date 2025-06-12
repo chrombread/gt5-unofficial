@@ -220,9 +220,13 @@ public class MTEDEFusionCrafter extends KubaTechGTMultiBlockBase<MTEDEFusionCraf
             @Override
             protected OverclockCalculator createOverclockCalculator(@NotNull GTRecipe recipe) {
                 return super.createOverclockCalculator(recipe)
-                    .setDurationModifier(1.0 / (mTierCasing - recipe.mSpecialValue + 1));
+                    .setMachineHeat(1800 * (mTierCasing - recipe.mSpecialValue))
+                    .setRecipeHeat(0).setHeatOC(true)
+                    .setHeatDiscount(false);
             }
-        };
+
+
+        }.enablePerfectOverclock();
     }
 
     @Override
