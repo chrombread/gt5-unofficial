@@ -11,6 +11,10 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.Nullable;
+
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectIterators;
 
 /**
@@ -44,6 +48,38 @@ public class GTDataUtils {
     public static <S, T> T[] mapToArray(S[] in, IntFunction<T[]> ctor, Function<S, T> mapper) {
         T[] out = ctor.apply(in.length);
         for (int i = 0; i < out.length; i++) out[i] = mapper.apply(in[i]);
+        return out;
+    }
+
+    public static int countNonNulls(Object[] array) {
+        int l = array.length;
+        int count = 0;
+
+        // noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < l; i++) {
+            if (array[i] != null) count++;
+        }
+
+        return count;
+    }
+
+    public static <T> T[] withoutNulls(T[] array) {
+        if (array.length == 0) return array;
+
+        int nonNullCount = GTDataUtils.countNonNulls(array);
+
+        if (nonNullCount == array.length) return array;
+
+        T[] out = Arrays.copyOf(array, nonNullCount);
+
+        int j = 0, l = array.length;
+
+        for (int i = 0; i < l; i++) {
+            T t = array[i];
+
+            if (t != null) out[j++] = t;
+        }
+
         return out;
     }
 
@@ -92,11 +128,13 @@ public class GTDataUtils {
         return -1;
     }
 
-    public static <T> T getIndexSafe(T[] array, int index) {
+    @Nullable
+    public static <T> T getIndexSafe(@Nullable T @Nullable [] array, int index) {
         return array == null || index < 0 || index >= array.length ? null : array[index];
     }
 
-    public static <T> T getIndexSafe(List<T> list, int index) {
+    @Nullable
+    public static <T> T getIndexSafe(@Nullable List<@Nullable T> list, int index) {
         return list == null || index < 0 || index >= list.size() ? null : list.get(index);
     }
 
@@ -140,5 +178,20 @@ public class GTDataUtils {
         }
 
         return out;
+    }
+
+    public static int[] intersect(int[] a, int[] b) {
+        IntLinkedOpenHashSet a2 = new IntLinkedOpenHashSet(a);
+        IntLinkedOpenHashSet b2 = new IntLinkedOpenHashSet(b);
+
+        IntArrayList out = new IntArrayList();
+
+        a2.forEach((int i) -> {
+            if (b2.contains(i)) {
+                out.add(i);
+            }
+        });
+
+        return out.toIntArray();
     }
 }

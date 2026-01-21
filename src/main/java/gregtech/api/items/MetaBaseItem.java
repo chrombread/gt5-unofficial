@@ -23,6 +23,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidContainerItem;
@@ -133,6 +134,12 @@ public abstract class MetaBaseItem extends GTGenericItem
         return forEachBehavior(aStack, behavior -> behavior.onMiddleClick(this, aStack, aPlayer));
     }
 
+    public void onBlockPlacedWhileWieldingOffhanded(BlockSnapshot snapshot, ItemStack itemStack, EntityPlayer player) {
+        forEachBehavior(
+            itemStack,
+            behavior -> behavior.onBlockPlacedWhileWieldingOffhanded(snapshot, itemStack, player));
+    }
+
     @Override
     public boolean onLeftClickEntity(ItemStack aStack, EntityPlayer aPlayer, Entity aEntity) {
         use(aStack, 0, aPlayer);
@@ -148,7 +155,7 @@ public abstract class MetaBaseItem extends GTGenericItem
                 aPlayer.destroyCurrentEquippedItem();
                 return false;
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             GTMod.GT_FML_LOGGER.error("Error left clicking entity", e);
         }
         return false;
@@ -170,7 +177,7 @@ public abstract class MetaBaseItem extends GTGenericItem
                 aPlayer.destroyCurrentEquippedItem();
                 return false;
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             GTMod.GT_FML_LOGGER.error("Error using item", e);
         }
         return false;
@@ -202,7 +209,7 @@ public abstract class MetaBaseItem extends GTGenericItem
                 aPlayer.destroyCurrentEquippedItem();
                 return false;
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             GTMod.GT_FML_LOGGER.error("Error using item", e);
         }
         return false;
@@ -216,7 +223,7 @@ public abstract class MetaBaseItem extends GTGenericItem
         try {
             if (tList != null) for (IItemBehaviour<MetaBaseItem> tBehavior : tList)
                 aStack = tBehavior.onItemRightClick(this, aStack, aWorld, aPlayer);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             GTMod.GT_FML_LOGGER.error("Error right clicking item", e);
         }
         return aStack;

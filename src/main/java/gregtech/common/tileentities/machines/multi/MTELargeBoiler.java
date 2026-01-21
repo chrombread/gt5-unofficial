@@ -78,7 +78,7 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
                     lazy(
                         t -> buildHatchAdder(MTELargeBoiler.class).atLeast(OutputHatch)
                             .casingIndex(t.getCasingTextureIndex())
-                            .dot(2)
+                            .hint(2)
                             .buildAndChain(
                                 onElementPass(
                                     MTELargeBoiler::onCasingAdded,
@@ -88,7 +88,7 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
                     lazy(
                         t -> buildHatchAdder(MTELargeBoiler.class).atLeast(Maintenance, InputHatch, InputBus, Muffler)
                             .casingIndex(t.getFireboxTextureIndex())
-                            .dot(1)
+                            .hint(1)
                             .buildAndChain(
                                 onElementPass(
                                     MTELargeBoiler::onFireboxAdded,
@@ -278,9 +278,13 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
                 if (tFluid != null && tRecipe.mSpecialValue > 1) {
                     tFluid.amount = 1000;
                     if (depleteInput(tFluid)) {
-                        this.mEfficiencyIncrease = this.mMaxProgresstime * getEfficiencyIncrease() * 4;
                         this.mMaxProgresstime = adjustBurnTimeForConfig(runtimeBoost(tRecipe.mSpecialValue / 2));
+                        this.mEfficiencyIncrease = this.mMaxProgresstime * getEfficiencyIncrease() * 4;
                         this.mEUt = adjustEUtForConfig(getEUt());
+                        if (this.mEfficiencyIncrease > 5000) {
+                            this.mEfficiencyIncrease = 0;
+                            this.mSuperEfficencyIncrease = 20;
+                        }
                         return CheckRecipeResultRegistry.SUCCESSFUL;
                     }
                 }
@@ -290,10 +294,14 @@ public abstract class MTELargeBoiler extends MTEEnhancedMultiBlockBase<MTELargeB
                 if (tFluid != null) {
                     tFluid.amount = 1000;
                     if (depleteInput(tFluid)) {
-                        this.mEfficiencyIncrease = this.mMaxProgresstime * getEfficiencyIncrease();
                         this.mMaxProgresstime = adjustBurnTimeForConfig(
                             Math.max(1, runtimeBoost(tRecipe.mSpecialValue * 2)));
+                        this.mEfficiencyIncrease = this.mMaxProgresstime * getEfficiencyIncrease();
                         this.mEUt = adjustEUtForConfig(getEUt());
+                        if (this.mEfficiencyIncrease > 5000) {
+                            this.mEfficiencyIncrease = 0;
+                            this.mSuperEfficencyIncrease = 20;
+                        }
                         return CheckRecipeResultRegistry.SUCCESSFUL;
                     }
                 }

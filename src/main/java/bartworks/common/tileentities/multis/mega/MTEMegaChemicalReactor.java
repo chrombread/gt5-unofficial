@@ -28,7 +28,7 @@ import static gregtech.api.util.GTStructureUtility.chainAllGlasses;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import com.gtnewhorizon.structurelib.alignment.constructable.ISurvivalConstructable;
@@ -50,6 +50,7 @@ import gregtech.api.recipe.RecipeMaps;
 import gregtech.api.render.TextureFactory;
 import gregtech.api.util.GTUtility;
 import gregtech.api.util.MultiblockTooltipBuilder;
+import gregtech.api.util.tooltip.TooltipHelper;
 import gregtech.common.misc.GTStructureChannels;
 
 public class MTEMegaChemicalReactor extends MegaMultiBlockBase<MTEMegaChemicalReactor>
@@ -69,13 +70,20 @@ public class MTEMegaChemicalReactor extends MegaMultiBlockBase<MTEMegaChemicalRe
     public MultiblockTooltipBuilder createTooltip() {
         final MultiblockTooltipBuilder tt = new MultiblockTooltipBuilder();
         tt.addMachineType("Chemical Reactor, MCR")
-            .addInfo("What molecule do you want to synthesize ?")
-            .addInfo("Or you want to replace something in this molecule ?")
+            .addInfo(
+                TooltipHelper.coloredText(
+                    TooltipHelper.italicText("\"What molecule do you want to synthesize?\""),
+                    EnumChatFormatting.DARK_GRAY))
+            .addInfo(
+                TooltipHelper.coloredText(
+                    TooltipHelper.italicText("\"Or do you want to replace something in this molecule?\""),
+                    EnumChatFormatting.DARK_GRAY))
             .addStaticParallelInfo(Configuration.Multiblocks.megaMachinesMax)
-            .addGlassEnergyLimitInfo()
             .addPerfectOCInfo()
+            .addSeparator()
             .addTecTechHatchInfo()
             .addMinGlassForLaser(VoltageIndex.UV)
+            .addGlassEnergyLimitInfo()
             .addUnlimitedTierSkips()
             .beginStructureBlock(5, 5, 9, false)
             .addController("Front center")
@@ -147,9 +155,9 @@ public class MTEMegaChemicalReactor extends MegaMultiBlockBase<MTEMegaChemicalRe
     public void onScrewdriverRightClick(ForgeDirection side, EntityPlayer aPlayer, float aX, float aY, float aZ,
         ItemStack aTool) {
         inputSeparation = !inputSeparation;
-        GTUtility.sendChatToPlayer(
+        GTUtility.sendChatTrans(
             aPlayer,
-            StatCollector.translateToLocal("GT5U.machines.separatebus") + " " + inputSeparation);
+            inputSeparation ? "GT5U.machines.separatebus.true" : "GT5U.machines.separatebus.false");
     }
 
     @Override
@@ -158,9 +166,9 @@ public class MTEMegaChemicalReactor extends MegaMultiBlockBase<MTEMegaChemicalRe
         if (aPlayer.isSneaking()) {
             this.batchMode = !this.batchMode;
             if (this.batchMode) {
-                GTUtility.sendChatToPlayer(aPlayer, StatCollector.translateToLocal("misc.BatchModeTextOn"));
+                GTUtility.sendChatTrans(aPlayer, "misc.BatchModeTextOn");
             } else {
-                GTUtility.sendChatToPlayer(aPlayer, StatCollector.translateToLocal("misc.BatchModeTextOff"));
+                GTUtility.sendChatTrans(aPlayer, "misc.BatchModeTextOff");
             }
             return true;
         }
@@ -234,7 +242,7 @@ public class MTEMegaChemicalReactor extends MegaMultiBlockBase<MTEMegaChemicalRe
             'd',
             buildHatchAdder(MTEMegaChemicalReactor.class).atLeast(InputBus, InputHatch, OutputBus, OutputHatch)
                 .casingIndex(CASING_INDEX)
-                .dot(1)
+                .hint(1)
                 .buildAndChain(GregTechAPI.sBlockCasings8, 0))
         .addElement('r', Maintenance.newAny(CASING_INDEX, 2))
         .addElement(
@@ -242,7 +250,7 @@ public class MTEMegaChemicalReactor extends MegaMultiBlockBase<MTEMegaChemicalRe
             buildHatchAdder(MTEMegaChemicalReactor.class)
                 .atLeast(Energy.or(ExoticEnergy), InputHatch, InputBus, OutputHatch, OutputBus)
                 .casingIndex(CASING_INDEX)
-                .dot(3)
+                .hint(3)
                 .buildAndChain(GregTechAPI.sBlockCasings8, 0))
         .addElement('c', ofChain(ofBlock(GregTechAPI.sBlockCasings4, 7), ofBlock(GregTechAPI.sBlockCasings5, 13)))
         .addElement('g', chainAllGlasses(-1, (te, t) -> te.glassTier = t, te -> te.glassTier))
